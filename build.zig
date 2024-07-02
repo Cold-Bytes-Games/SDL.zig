@@ -411,7 +411,7 @@ pub fn link(sdk: *Sdk, exe: *Compile, linkage: std.builtin.LinkMode) void {
                 sdk_paths.bin,
                 "SDL2.dll",
             }) catch @panic("out of memory");
-            sdk.build.installBinFile(sdl2_dll_path, "SDL2.dll");
+            sdk.build.getInstallStep().dependOn(&sdk.build.addInstallFileWithDir(.{ .cwd_relative = sdl2_dll_path }, .bin, "SDL2.dll").step);
         }
     } else if (target.result.isDarwin()) {
         // TODO: Implement cross-compilaton to macOS via system root provisioning
