@@ -543,8 +543,8 @@ const PrepareStubSourceStep = struct {
         return .{ .generated = .{ .file = &self.assembly_source } };
     }
 
-    fn make(step: *Step, prog_node: std.Progress.Node) !void {
-        _ = prog_node;
+    fn make(step: *Step, options: std.Build.Step.MakeOptions) !void {
+        _ = options;
         const self: *Self = @fieldParentPtr("step", step);
 
         var cache = CacheBuilder.init(self.sdk.builder, "sdl");
