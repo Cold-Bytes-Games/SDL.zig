@@ -10,14 +10,15 @@ This is an example `build.zig` that will link the SDL2 library to your project.
 
 ```zig
 const std = @import("std");
-const sdl = @import("SDL.zig/build.zig"); // Replace with the actual path in your project
+const sdl = @import("sdl"); // Replace with the actual name in your build.zig.zon
 
 pub fn build(b: *std.Build) !void {
     // Determine compilation target
     const target = b.standardTargetOptions(.{});
 
     // Create a new instance of the SDL2 Sdk
-    const sdk = sdl.init(b, null, null);
+    // Specifiy dependency name explicitly if necessary (use sdl by default) 
+    const sdk = sdl.init(b, .{});
 
     // Create executable for our example
     const demo_basic = b.addExecutable(.{
@@ -128,12 +129,19 @@ pub fn main() !void {
 ## `build.zig` API
 
 ```zig
-/// Just call `Sdk.init(b, null)` to obtain a handle to the Sdk!
+/// Just call `Sdk.init(b, .{})` to obtain a handle to the Sdk!
+/// Use `sdl` as dependency name by default.
 const Sdk = @This();
 
 /// Creates a instance of the Sdk and initializes internal steps.
 /// Initialize once, use everywhere (in your `build` function).
-pub fn init(b: *Build, maybe_config_path: ?[]const u8) *Sdk
+///
+/// const SdkOption = struct {
+///     dep_name: ?[]const u8 = "sdl",
+///     maybe_config_path: ?[]const u8 = null,
+///     maybe_sdl_ttf_config_path: ?[]const u8 = null,
+/// };
+pub fn init(b: *Build, opt: SdkOption) *Sdk
 
 /// Returns a module with the raw SDL api with proper argument types, but no functional/logical changes
 /// for a more *ziggy* feeling.
@@ -153,13 +161,9 @@ pub fn getWrapperModule(sdk: *Sdk) *Build.Module;
 /// provided as an argument.
 pub fn getWrapperModuleVulkan(sdk: *Sdk, vulkan: *Build.Module) *Build.Module;
 
-/// Links SDL2 to the given exe and adds required installs if necessary.
+/// Links SDL2 or SDL2_ttf to the given exe and adds required installs if necessary.
 /// **Important:** The target of the `exe` must already be set, otherwise the Sdk will do the wrong thing!
-pub fn link(sdk: *Sdk, exe: *LibExeObjStep, linkage: std.Build.LibExeObjStep.Linkage) void;
-
-/// Links SDL2 TTF to the given exe.
-/// **Important:** The target of the `exe` must already be set, otherwise the Sdk will do the wrong thing!
-pub fn linkTtf(sdk: *Sdk, exe: *Compile) void;
+pub fn link(sdk: *Sdk, exe: *Build.Step.Compile, linkage: std.builtin.LinkMode, comptime library: Library) void;
 ```
 
 ## Dependencies
