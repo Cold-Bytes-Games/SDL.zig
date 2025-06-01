@@ -1700,6 +1700,7 @@ pub const Event = union(enum) {
     drop_begin: DropEvent,
     drop_complete: DropEvent,
     user: UserEvent,
+    unsupported: u32,
 
     pub fn from(raw: c.SDL_Event) Event {
         return switch (raw.type) {
@@ -1753,7 +1754,7 @@ pub const Event = union(enum) {
             c.SDL_RENDER_TARGETS_RESET => Event{ .render_targets_reset = raw.common },
             c.SDL_RENDER_DEVICE_RESET => Event{ .render_device_reset = raw.common },
             c.SDL_USEREVENT => Event{ .user = UserEvent.from(raw.user) },
-            else => @panic("Unsupported event type detected!"),
+            else => Event{ .unsupported = raw.type },
         };
     }
 };
