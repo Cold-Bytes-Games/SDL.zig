@@ -10,99 +10,105 @@ const builtin = @import("builtin");
 pub const Library = enum { SDL2, SDL2_ttf };
 
 pub fn build(b: *std.Build) !void {
-    const sdk = Sdk.init(b, .{ .dep_name = null });
+    // mlarouche: Comment everything to make cross-compiling works
+    _ = b; // autofix
+    // const sdk = Sdk.init(b, .{ .dep_name = null });
+    // _ = sdk; // autofix
 
-    const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{});
+    // const target = b.standardTargetOptions(.{});
+    // _ = target; // autofix
+    // const optimize = b.standardOptimizeOption(.{});
+    // _ = optimize; // autofix
 
-    const sdl_linkage = b.option(std.builtin.LinkMode, "link", "Defines how to link SDL2 when building with mingw32") orelse .dynamic;
+    // const sdl_linkage = b.option(std.builtin.LinkMode, "link", "Defines how to link SDL2 when building with mingw32") orelse .dynamic;
+    // _ = sdl_linkage; // autofix
 
-    const skip_tests = b.option(bool, "skip-test", "When set, skips the test suite to be run. This is required for cross-builds") orelse false;
+    // const skip_tests = b.option(bool, "skip-test", "When set, skips the test suite to be run. This is required for cross-builds") orelse false;
 
-    if (!skip_tests) {
-        const lib_test = b.addTest(.{
-            .root_source_file = .{ .cwd_relative = "src/wrapper/sdl.zig" },
-            .target = if (target.result.os.tag == .windows)
-                b.resolveTargetQuery(.{ .abi = target.result.abi })
-            else
-                null,
-        });
-        lib_test.root_module.addImport("sdl-native", sdk.getNativeModule());
-        lib_test.linkSystemLibrary("sdl2_image");
-        lib_test.linkSystemLibrary("sdl2_ttf");
-        if (lib_test.rootModuleTarget().isDarwinLibC()) {
-            // SDL_TTF
-            lib_test.linkSystemLibrary("freetype");
-            lib_test.linkSystemLibrary("harfbuzz");
-            lib_test.linkSystemLibrary("bz2");
-            lib_test.linkSystemLibrary("zlib");
-            lib_test.linkSystemLibrary("graphite2");
+    // if (!skip_tests) {
+    //     const lib_test = b.addTest(.{
+    //         .root_source_file = .{ .cwd_relative = "src/wrapper/sdl.zig" },
+    //         .target = if (target.result.os.tag == .windows)
+    //             b.resolveTargetQuery(.{ .abi = target.result.abi })
+    //         else
+    //             null,
+    //     });
+    //     lib_test.root_module.addImport("sdl-native", sdk.getNativeModule());
+    //     lib_test.linkSystemLibrary("sdl2_image");
+    //     lib_test.linkSystemLibrary("sdl2_ttf");
+    //     if (lib_test.rootModuleTarget().isDarwinLibC()) {
+    //         // SDL_TTF
+    //         lib_test.linkSystemLibrary("freetype");
+    //         lib_test.linkSystemLibrary("harfbuzz");
+    //         lib_test.linkSystemLibrary("bz2");
+    //         lib_test.linkSystemLibrary("zlib");
+    //         lib_test.linkSystemLibrary("graphite2");
 
-            // SDL_IMAGE
-            lib_test.linkSystemLibrary("jpeg");
-            lib_test.linkSystemLibrary("libpng");
-            lib_test.linkSystemLibrary("tiff");
-            lib_test.linkSystemLibrary("sdl2");
-            lib_test.linkSystemLibrary("webp");
-        }
-        sdk.link(lib_test, .dynamic, .SDL2);
+    //         // SDL_IMAGE
+    //         lib_test.linkSystemLibrary("jpeg");
+    //         lib_test.linkSystemLibrary("libpng");
+    //         lib_test.linkSystemLibrary("tiff");
+    //         lib_test.linkSystemLibrary("sdl2");
+    //         lib_test.linkSystemLibrary("webp");
+    //     }
+    //     sdk.link(lib_test, .dynamic, .SDL2);
 
-        const test_lib_step = b.step("test", "Runs the library tests.");
-        test_lib_step.dependOn(&lib_test.step);
-    }
+    //     const test_lib_step = b.step("test", "Runs the library tests.");
+    //     test_lib_step.dependOn(&lib_test.step);
+    // }
 
-    const demo_wrapper = b.addExecutable(.{
-        .name = "demo-wrapper",
-        .root_source_file = .{ .cwd_relative = "examples/wrapper.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-    sdk.link(demo_wrapper, sdl_linkage, .SDL2);
-    demo_wrapper.root_module.addImport("sdl2", sdk.getWrapperModule());
-    b.installArtifact(demo_wrapper);
+    // const demo_wrapper = b.addExecutable(.{
+    //     .name = "demo-wrapper",
+    //     .root_source_file = .{ .cwd_relative = "examples/wrapper.zig" },
+    //     .target = target,
+    //     .optimize = optimize,
+    // });
+    // sdk.link(demo_wrapper, sdl_linkage, .SDL2);
+    // demo_wrapper.root_module.addImport("sdl2", sdk.getWrapperModule());
+    // b.installArtifact(demo_wrapper);
 
-    const demo_wrapper_image = b.addExecutable(.{
-        .name = "demo-wrapper-image",
-        .root_source_file = .{ .cwd_relative = "examples/wrapper-image.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-    sdk.link(demo_wrapper_image, sdl_linkage, .SDL2);
-    demo_wrapper_image.root_module.addImport("sdl2", sdk.getWrapperModule());
-    demo_wrapper_image.linkSystemLibrary("sdl2_image");
-    demo_wrapper_image.linkSystemLibrary("jpeg");
-    demo_wrapper_image.linkSystemLibrary("libpng");
-    demo_wrapper_image.linkSystemLibrary("tiff");
-    demo_wrapper_image.linkSystemLibrary("webp");
+    // const demo_wrapper_image = b.addExecutable(.{
+    //     .name = "demo-wrapper-image",
+    //     .root_source_file = .{ .cwd_relative = "examples/wrapper-image.zig" },
+    //     .target = target,
+    //     .optimize = optimize,
+    // });
+    // sdk.link(demo_wrapper_image, sdl_linkage, .SDL2);
+    // demo_wrapper_image.root_module.addImport("sdl2", sdk.getWrapperModule());
+    // demo_wrapper_image.linkSystemLibrary("sdl2_image");
+    // demo_wrapper_image.linkSystemLibrary("jpeg");
+    // demo_wrapper_image.linkSystemLibrary("libpng");
+    // demo_wrapper_image.linkSystemLibrary("tiff");
+    // demo_wrapper_image.linkSystemLibrary("webp");
 
-    if (target.query.isNative() and target.result.os.tag == .linux) {
-        b.installArtifact(demo_wrapper_image);
-    }
+    // if (target.query.isNative() and target.result.os.tag == .linux) {
+    //     b.installArtifact(demo_wrapper_image);
+    // }
 
-    const demo_native = b.addExecutable(.{
-        .name = "demo-native",
-        .root_source_file = .{ .cwd_relative = "examples/native.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-    sdk.link(demo_native, sdl_linkage, .SDL2);
-    demo_native.root_module.addImport("sdl2", sdk.getNativeModule());
-    b.installArtifact(demo_native);
+    // const demo_native = b.addExecutable(.{
+    //     .name = "demo-native",
+    //     .root_source_file = .{ .cwd_relative = "examples/native.zig" },
+    //     .target = target,
+    //     .optimize = optimize,
+    // });
+    // sdk.link(demo_native, sdl_linkage, .SDL2);
+    // demo_native.root_module.addImport("sdl2", sdk.getNativeModule());
+    // b.installArtifact(demo_native);
 
-    const run_demo_wrappr = b.addRunArtifact(demo_wrapper);
+    // const run_demo_wrappr = b.addRunArtifact(demo_wrapper);
 
-    const run_demo_wrappr_image = b.addRunArtifact(demo_wrapper_image);
+    // const run_demo_wrappr_image = b.addRunArtifact(demo_wrapper_image);
 
-    const run_demo_native = b.addRunArtifact(demo_native);
+    // const run_demo_native = b.addRunArtifact(demo_native);
 
-    const run_demo_wrapper_step = b.step("run-wrapper", "Runs the demo for the SDL2 wrapper library");
-    run_demo_wrapper_step.dependOn(&run_demo_wrappr.step);
+    // const run_demo_wrapper_step = b.step("run-wrapper", "Runs the demo for the SDL2 wrapper library");
+    // run_demo_wrapper_step.dependOn(&run_demo_wrappr.step);
 
-    const run_demo_wrapper_image_step = b.step("run-wrapper-image", "Runs the demo for the SDL2 wrapper library");
-    run_demo_wrapper_image_step.dependOn(&run_demo_wrappr_image.step);
+    // const run_demo_wrapper_image_step = b.step("run-wrapper-image", "Runs the demo for the SDL2 wrapper library");
+    // run_demo_wrapper_image_step.dependOn(&run_demo_wrappr_image.step);
 
-    const run_demo_native_step = b.step("run-native", "Runs the demo for the SDL2 native library");
-    run_demo_native_step.dependOn(&run_demo_native.step);
+    // const run_demo_native_step = b.step("run-native", "Runs the demo for the SDL2 native library");
+    // run_demo_native_step.dependOn(&run_demo_native.step);
 }
 
 const host_system = @import("builtin").target;
