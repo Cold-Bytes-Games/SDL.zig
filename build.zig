@@ -563,7 +563,10 @@ const PrepareStubSourceStep = struct {
         var file = try dirpath.dir.createFile("sdl.S", .{});
         defer file.close();
 
-        var writer = file.writer();
+        var write_buffer: [4096]u8 = undefined;
+        var file_writer = file.writer(write_buffer[0..]);
+        var writer = &file_writer.interface;
+
         try writer.writeAll(".text\n");
 
         var iter = std.mem.splitScalar(u8, sdl2_symbol_definitions, '\n');
@@ -630,20 +633,20 @@ const CacheBuilder = struct {
         const path = if (self.subdir) |subdir|
             try std.fmt.allocPrint(
                 self.builder.allocator,
-                "{s}/{s}/o/{}",
+                "{s}/{s}/o/{x}",
                 .{
                     self.builder.cache_root.path.?,
                     subdir,
-                    std.fmt.fmtSliceHexLower(&hash),
+                    &hash,
                 },
             )
         else
             try std.fmt.allocPrint(
                 self.builder.allocator,
-                "{s}/o/{}",
+                "{s}/o/{x}",
                 .{
                     self.builder.cache_root.path.?,
-                    std.fmt.fmtSliceHexLower(&hash),
+                    &hash,
                 },
             );
 
