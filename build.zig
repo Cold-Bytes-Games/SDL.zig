@@ -237,10 +237,13 @@ pub fn getWrapperModuleVulkan(sdk: *Sdk, vulkan: *Build.Module) *Build.Module {
 }
 
 fn linkLinuxCross(sdk: *Sdk, exe: *Compile) !void {
-    const build_linux_sdl_stub = sdk.builder.addSharedLibrary(.{
+    const build_linux_sdl_stub = sdk.builder.addLibrary(.{
         .name = "SDL2",
-        .target = exe.root_module.resolved_target.?,
-        .optimize = exe.root_module.optimize.?,
+        .linkage = .dynamic,
+        .root_module = sdk.builder.createModule(.{
+            .target = exe.root_module.resolved_target.?,
+            .optimize = exe.root_module.optimize.?,
+        }),
     });
     build_linux_sdl_stub.addAssemblyFile(sdk.prepare_sources.getStubFile());
     exe.linkLibrary(build_linux_sdl_stub);
@@ -407,7 +410,7 @@ const GetPathsError = error{
 };
 
 fn printPathsErrorMessage(sdk: *Sdk, config_path: []const u8, target_local: std.Build.ResolvedTarget, err: GetPathsError, library: Library) !void {
-    const writer = std.io.getStdErr().writer();
+    var writer = std.fs.File.stderr().writer(&.{}).interface;
     const target_name = try tripleName(sdk.builder.allocator, target_local);
     defer sdk.builder.allocator.free(target_name);
 
@@ -637,7 +640,7 @@ const CacheBuilder = struct {
                 .{
                     self.builder.cache_root.path.?,
                     subdir,
-                    &hash,
+                    hash,
                 },
             )
         else
@@ -646,7 +649,7 @@ const CacheBuilder = struct {
                 "{s}/o/{x}",
                 .{
                     self.builder.cache_root.path.?,
-                    &hash,
+                    hash,
                 },
             );
 
